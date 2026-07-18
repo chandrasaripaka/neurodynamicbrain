@@ -291,6 +291,17 @@ Every signal has amplitude, time, location, and coupling. Each below is a concre
 ```
 **Never paste a full document into a cell** — a cell holding a 50-page spec is a saturation bomb, not a handle.
 
+**Per-machine boundary (only portable signal syncs).** The brain is shared across machines through one git repo, but **only durable, portable signal rides it** — cells, index, references, skills, and the transient handoff note. Everything below is per-machine local state that must **never** sync; raw sync would leak credentials/paths or break the peer machine:
+
+```
+sessions/       conversation state      telemetry/        analytics
+projects/       session metadata        backups/          local backups
+file-history/   edit history            shell-snapshots/  shell env captures
+settings.json   creds/paths/hooks       ide/              IDE socket state
+```
+
+The first three are read *locally, read-only* and distilled into a host-tagged block in the handoff note — that distilled block is the only trace that travels. Enforce this in code, not discipline: the sync effectors carry a blacklist guard that aborts (or silently unstages) any of these paths staged for the shared repo. Adding a new per-machine dir means updating the guard, not just the prose.
+
 **Anti-patterns (pathological configurations):**
 
 | Anti-pattern | Pathology | Consequence |
